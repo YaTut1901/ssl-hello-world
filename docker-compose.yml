@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  ca-server:
+    build:
+      context: ./ca-server
+      dockerfile: Dockerfile
+    container_name: ca-server
+    networks: [tls-net]
+
+  hello-server:
+    build:
+      context: ./hello-server
+      dockerfile: Dockerfile
+    container_name: hello-server
+    depends_on:
+      - ca-server
+    networks: [tls-net]
+
+  hello-client:
+    build:
+      context: ./hello-client
+      dockerfile: Dockerfile
+    container_name: hello-client
+    depends_on:
+      - hello-server
+      - ca-server
+    networks: [tls-net]
+
+networks:
+  tls-net:
+    driver: bridge
