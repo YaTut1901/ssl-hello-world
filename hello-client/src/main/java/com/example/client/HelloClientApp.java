@@ -94,7 +94,6 @@ public class HelloClientApp {
             }
 
             try {
-                // Diagnostic: fetch server chain with trust-all and validate against our trust store
                 try {
                     debugFetchAndValidateServerChain(sslContext);
                 } catch (Exception diagEx) {
@@ -240,7 +239,6 @@ public class HelloClientApp {
 
         private String thumbprint(byte[] extVal) {
             if (extVal == null || extVal.length == 0) return "null";
-            // extVal is OCTET STRING, show base64 for quick view
             return Base64.getEncoder().encodeToString(extVal);
         }
     }
