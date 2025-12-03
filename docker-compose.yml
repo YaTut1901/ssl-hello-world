@@ -1,4 +1,5 @@
-version: "3.9"
+volumes:
+  ca-root-vol:
 
 services:
   ca-server:
@@ -6,6 +7,12 @@ services:
       context: ./ca-server
       dockerfile: Dockerfile
     container_name: ca-server
+    environment:
+      CA_PASSWORD: ${CA_PASSWORD}
+      CA_ISSUE_ENDPOINT: ${CA_ISSUE_ENDPOINT}
+      CA_SERVER_PORT: ${CA_SERVER_PORT}
+    volumes:
+      - ca-root-vol:/certs
     networks: [tls-net]
 
   hello-server:
@@ -15,6 +22,14 @@ services:
     container_name: hello-server
     depends_on:
       - ca-server
+    volumes:
+      - ca-root-vol:/certs
+    environment:
+      SERVER_PASSWORD: ${SERVER_PASSWORD}
+      CA_ISSUE_ENDPOINT: ${CA_ISSUE_ENDPOINT}
+      CA_SERVER_PORT: ${CA_SERVER_PORT}
+      SERVER_PORT: ${SERVER_PORT}
+      JAVA_TOOL_OPTIONS: "-Djavax.net.debug=ssl,handshake,trustmanager"
     networks: [tls-net]
 
   hello-client:
@@ -25,6 +40,15 @@ services:
     depends_on:
       - hello-server
       - ca-server
+    volumes:
+      - ca-root-vol:/certs
+    environment:
+      CA_ISSUE_ENDPOINT: ${CA_ISSUE_ENDPOINT}
+      CA_SERVER_PORT: ${CA_SERVER_PORT}
+      CLIENT_PASSWORD: ${CLIENT_PASSWORD}
+      CLIENT_PORT: ${CLIENT_PORT}
+      SERVER_PORT: ${SERVER_PORT}
+      JAVA_TOOL_OPTIONS: "-Djavax.net.debug=ssl,handshake,trustmanager"
     networks: [tls-net]
 
 networks:
